@@ -1,27 +1,70 @@
-# CarsApp
+## Создание Dockerfile
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.6.
+Создаем в корневой папке файл Dockerfile.
+``` # Используем официальный образ Node.js
+FROM node:18
 
-## Development server
+# Устанавливаем рабочую директорию
+WORKDIR /app
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+COPY package*.json ./
 
-## Code scaffolding
+# Очищаем кэш npm
+RUN npm cache clean --force
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# Устанавливаем зависимости
+RUN npm install
 
-## Build
+# Копируем остальные файлы проекта
+COPY . .
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+# Открываем порт, на котором будет работать Angular CLI
+EXPOSE 4200
 
-## Running unit tests
+ENV NG_CLI_ANALYTICS=false
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+# Запускаем Angular приложение
+CMD ["npm", "start", "--", "--host", "0.0.0.0"]
+```
 
-## Running end-to-end tests
+Порт в целях безопасноси Docker автоматически не открывает, он просто говорит что мы используем этот порт.
+Сам порт можем указать в дальнейшем при запуске контейнера.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Создание образа
 
-## Further help
+Запускаем терминал, переходим в корневую папку проекта `cd (путь до корневой папки с проектом)`.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Создаем образ, где 'project' - это название: `sudo docker build -t project .`
+
+Ждём окончания создания.
+
+## Создание и запуск контейнера
+
+Создаем и запускаем контейнер командой `docker run -p (порт):4200 project`
+
+Я запускал на порту 9999, соответственно команда была: `docker run -p 9999:4200 project`
+
+`docker run` запускает контейнер, далее идет флаг `-p`, который принимает [HOST_PORT]:[CONTAINER_PORT],
+соответственно порт хоста, который мы как раз можем менять (нужно чтобы он был свободен) и порт контейнера,
+на который будет пробрасываться.
+
+После запуска контейнера можем перейти на `localhost:(порт)` в браузере и посмотреть сайт, запущенный из контейнера.
+В моём случае `localhost:9999`.
+
+Я пользовался Docker Desktop, поэтому контейнер могу запускать оттуда.
+
+## Если не загружает node:18
+
+В ходе работы столкнулся с проблемой. Не работало `FROM node:18` из Dockerfile.
+
+Выдавало такую ошибку:
+`ERROR: failed to solve: node:18: failed to resolve source metadata for docker.io/library/node:18: error getting credentials - err: exit status 1, out: `
+
+В моём случае это было связано с операционной системой, на которой я работал - MacOS.
+
+Решение: перейти из домашней папки в скрытую директорию **.docker** в файл **config.json** (путь: *~/.docker/config.json*),
+изменить параметр **"credsStore" : "desktop"** на **"credsStore" : "osxkeychain"**.
+
+## Работу выполнил Артюшин Артём ФТ-320008
+
+
