@@ -43,6 +43,10 @@ CMD ["npm", "start", "--", "--host", "0.0.0.0"]
 
 Ждём окончания создания.
 
+Готовый образ в разделе 'images':
+
+![img](https://github.com/A1r3t0/cars-app-docker/blob/main/1.png)
+
 ## Создание и запуск контейнера
 
 Создаем и запускаем контейнер командой `docker run -p (порт):4200 project`
@@ -57,6 +61,14 @@ CMD ["npm", "start", "--", "--host", "0.0.0.0"]
 В моём случае `localhost:9999`.
 
 Я пользовался Docker Desktop, поэтому контейнер могу запускать оттуда.
+
+Также из докера можно переходить сразу, наводя на порт:
+
+![img](https://github.com/A1r3t0/cars-app-docker/blob/main/2.png)
+
+Запущенный проект:
+
+![img](https://github.com/A1r3t0/cars-app-docker/blob/main/3.png)
 
 ## Если не загружает node:18
 
